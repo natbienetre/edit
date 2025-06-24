@@ -1,0 +1,214 @@
+# Source: https://raw.githubusercontent.com/bitnami/bitnami-docker-wordpress/master/docker-compose.yml
+services:
+  mariadb:
+    image: docker.io/mariadb:10.6
+    container_name: base-de-donnees
+    volumes:
+      - 'mariadb_data:/var/lib/mysql'
+    networks:
+      - backend
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=yes
+      - MARIADB_SKIP_TEST_DB=yes
+      - MARIADB_USER=wordpress
+      - MARIADB_DATABASE=wordpress
+
+  wordpress:
+    build:
+      context: ./wordpress
+    # image: wordpress:php8.2-apache
+    container_name: wordpress
+    labels:
+      - networks=bridge
+    user: "1001:root"
+    networks:
+      - backend
+#    network_mode: host
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - './wordpress/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro'
+      - './wordpress/apache.conf:/etc/apache2/sites-enabled/000-default.conf:ro'
+      - 'wordpress_data:/var/www/html'
+      - 'site_html:/opt/bitnami/wordpress_static'
+      - './certs/edit.natbienetre.fr.cert:/mnt/edit.natbienetre.fr.cert'
+      - './certs/edit.natbienetre.fr.key:/mnt/edit.natbienetre.fr.key'
+    depends_on:
+      mariadb:
+        condition: service_healthy
+        restart: true
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - WORDPRESS_DEBUG=1
+      - ALLOW_EMPTY_PASSWORD=yes
+      - WORDPRESS_DATABASE_HOST=mariadb
+      - WORDPRESS_DATABASE_PORT_NUMBER=3306
+      - WORDPRESS_DATABASE_USER=wordpress
+      - WORDPRESS_DATABASE_NAME=wordpress
+    extra_hosts:
+      edit.natbienetre.fr: 127.0.0.1
+      natbienetre.fr: 127.0.0.1
+
+  wordpress-cli:
+    image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
+    container_name: wordpress-cli
+    labels:
+      - networks=bridge
+    user: "1001:root"
+    networks:
+      - backend
+    volumes:
+      - 'wordpress_data:/var/www/html'
+      - 'site_html:/opt/bitnami/wordpress_static'
+    depends_on:
+      - mariadb
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - WORDPRESS_DEBUG=1
+      - ALLOW_EMPTY_PASSWORD=yes
+      - WORDPRESS_DATABASE_HOST=mariadb
+      - WORDPRESS_DATABASE_PORT_NUMBER=3306
+      - WORDPRESS_DATABASE_USER=wordpress
+      - WORDPRESS_DATABASE_NAME=wordpress
+    extra_hosts:
+      edit.natbienetre.fr: 127.0.0.1
+    entrypoint: ["/usr/bin/env", "bash", "-c", "sleep infinite"]
+
+  sauvegarde:
+    image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
+    container_name: sauvegarde
+    labels:
+      - networks=bridge
+    user: "1001:root"
+    networks:
+      - backend
+    volumes:
+      - 'wordpress_data:/var/www/html'
+      - 'backups:/opt/backups'
+    depends_on:
+      - mariadb
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - WORDPRESS_DEBUG=1
+      - ALLOW_EMPTY_PASSWORD=yes
+      - WORDPRESS_DATABASE_HOST=mariadb
+      - WORDPRESS_DATABASE_PORT_NUMBER=3306
+      - WORDPRESS_DATABASE_USER=wordpress
+      - WORDPRESS_DATABASE_NAME=wordpress
+    extra_hosts:
+      edit.natbienetre.fr: 127.0.0.1
+    entrypoint: ["/usr/bin/env", "bash", "-c", "wp db export \"/opt/backups/$(date '+%Y-%m-%d %H:%M:%S').sql\""]
+
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    labels:
+      - networks=bridge
+    command:
+      - tunnel
+      - --no-autoupdate
+      - --metrics
+      - localhost:3333
+      - run
+      - --token
+      - eyJhIjoiNTUzZGEzYWMyOWI3MDY5ZjUwN2RlNGIzZDUwNTIwNTAiLCJ0IjoiMzgxMWUwMTctYzBhZS00MTc1LTljZGMtNDI3YTNiZmQ1NWJhIiwicyI6Ik1UVmhaamc1TTJJdE9HUXhPUzAwWXpneUxUaG1ZbUl0TWpsaVpEWTRZVFF6TVdGayJ9
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3333/ready"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+    networks:
+      - backend
+    volumes:
+      - './certs/rootCA.crt:/mnt/natbienetre.fr.pem'
+    secrets:
+      - source: cloudflare-tunnel-token
+        target: tunnel.token
+    restart: "always"
+
+  media:
+    image: docker.io/rclone/rclone:1
+    container_name: synchroniser-les-media
+    user: "1001:0"
+    command: >-
+      copy /mnt/wordpress/wp-content/uploads natbienetre:natbienetre -v
+        --fast-list --metadata
+        --config /run/secrets/rclone.conf
+        --exclude '/simply-static/**'
+        --exclude '/wpcode-logs/**'
+    #    --include '/{{\d{4}/.*}}'
+    #    --include '/uag-plugin/**'
+    volumes:
+      - 'wordpress_data:/mnt/wordpress'
+    secrets:
+      - source: rclone_configuration
+        target: rclone.conf
+        uid: "1001"
+        gid: "0"
+        mode: 0400
+    restart: "no"
+
+  pages:
+    build:
+      context: ./static_html
+    command:
+      - https://github.com/natbienetre/www.git
+    container_name: publier-le-site
+    environment:
+      - SOURCE=/mnt/site_html
+    volumes:
+      - 'site_html:/mnt/site_html'
+      - 'static_repo:/gitrepo'
+    secrets:
+      - source: git_configuration
+        target: gitconfig
+        uid: "1001"
+        gid: "0"
+        mode: 0400
+    restart: "no"
+
+networks:
+  bridge:
+    external: true
+  backend: {}
+
+volumes:
+  mariadb_data:
+    driver: local
+  wordpress_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: data/wordpress
+  backups:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: data/sauvegardes
+  site_html:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: data/static
+  static_repo:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: data/repo
+
+secrets:
+  git_configuration:
+    file: ~/.gitconfig
+  rclone_configuration:
+    file: ~/.config/rclone/rclone.conf
+  cloudflare-tunnel-token:
+    file: ~/.config/cloudflare/tunnel.token
