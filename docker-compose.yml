@@ -104,8 +104,8 @@ services:
       - --metrics
       - localhost:3333
       - run
-      - --token
-      - eyJhIjoiNTUzZGEzYWMyOWI3MDY5ZjUwN2RlNGIzZDUwNTIwNTAiLCJ0IjoiMzgxMWUwMTctYzBhZS00MTc1LTljZGMtNDI3YTNiZmQ1NWJhIiwicyI6Ik1UVmhaamc1TTJJdE9HUXhPUzAwWXpneUxUaG1ZbUl0TWpsaVpEWTRZVFF6TVdGayJ9
+      - --token-file
+      - /run/secrets/cloudflare-tunnel-token
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3333/ready"]
       interval: 1m30s
@@ -115,8 +115,8 @@ services:
 
     networks:
       - backend
-    volumes:
-      - './certs/rootCA.crt:/mnt/natbienetre.fr.pem'
+    #volumes:
+    #  - './certs/rootCA.crt:/mnt/natbienetre.fr.pem'
     secrets:
       - source: cloudflare-tunnel-token
         target: tunnel.token
