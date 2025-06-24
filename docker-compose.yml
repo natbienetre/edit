@@ -27,6 +27,9 @@ services:
     volumes:
       - 'wordpress_data:/var/www/html'
       - 'site_html:/opt/bitnami/wordpress_static'
+    secrets:
+      - source: manual_natbienetre_wordpress_certificate
+      - source: manual_natbienetre_wordpress_key
     depends_on:
       mariadb:
         condition: service_healthy
@@ -184,3 +187,7 @@ secrets:
     file: ~/.config/rclone/rclone.conf
   cloudflare-tunnel-token:
     file: ~/.config/cloudflare/tunnel.token
+  manual_natbienetre_wordpress_certificate:
+    external: true
+  manual_natbienetre_wordpress_key:
+    external: true
