@@ -171,28 +171,12 @@ volumes:
     driver: local
   wordpress_data:
     driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: data/wordpress
   backups:
     driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: data/sauvegardes
   site_html:
     driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: data/static
   static_repo:
     driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: data/repo
 
 secrets:
   git_configuration:
