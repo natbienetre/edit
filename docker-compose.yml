@@ -47,8 +47,8 @@ services:
       - WORDPRESS_DATABASE_USER=wordpress
       - WORDPRESS_DATABASE_NAME=wordpress
     extra_hosts:
-      edit.natbienetre.fr: 127.0.0.1
-      natbienetre.fr: 127.0.0.1
+      - edit.natbienetre.fr:127.0.0.1
+      - natbienetre.fr:127.0.0.1
 
   wordpress-cli:
     image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
@@ -71,7 +71,7 @@ services:
       - WORDPRESS_DATABASE_USER=wordpress
       - WORDPRESS_DATABASE_NAME=wordpress
     extra_hosts:
-      edit.natbienetre.fr: 127.0.0.1
+      - edit.natbienetre.fr:127.0.0.1
     entrypoint: ["/usr/bin/env", "bash", "-c", "sleep infinite"]
 
   sauvegarde:
@@ -95,7 +95,7 @@ services:
       - WORDPRESS_DATABASE_USER=wordpress
       - WORDPRESS_DATABASE_NAME=wordpress
     extra_hosts:
-      edit.natbienetre.fr: 127.0.0.1
+      - edit.natbienetre.fr:127.0.0.1
     entrypoint: ["/usr/bin/env", "bash", "-c", "wp db export \"/opt/backups/$(date '+%Y-%m-%d %H:%M:%S').sql\""]
 
   cloudflare-tunnel:
