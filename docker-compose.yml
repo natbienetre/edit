@@ -28,12 +28,8 @@ services:
       - '80:80'
       - '443:443'
     volumes:
-      - './wordpress/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro'
-      - './wordpress/apache.conf:/etc/apache2/sites-enabled/000-default.conf:ro'
       - 'wordpress_data:/var/www/html'
       - 'site_html:/opt/bitnami/wordpress_static'
-      - './certs/edit.natbienetre.fr.cert:/mnt/edit.natbienetre.fr.cert'
-      - './certs/edit.natbienetre.fr.key:/mnt/edit.natbienetre.fr.key'
     depends_on:
       mariadb:
         condition: service_healthy
