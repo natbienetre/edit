@@ -166,8 +166,8 @@ services:
     restart: "no"
 
 networks:
-  bridge:
-    external: true
+  #bridge:
+  #  external: true
   backend: {}
 
 volumes:
