@@ -2,7 +2,6 @@
 services:
   mariadb:
     image: docker.io/mariadb:10.6
-    container_name: base-de-donnees
     volumes:
       - 'mariadb_data:/var/lib/mysql'
     networks:
@@ -19,7 +18,6 @@ services:
     build:
       context: ./wordpress
     # image: wordpress:php8.2-apache
-    container_name: wordpress
     labels:
       - networks=bridge
     user: "1001:root"
@@ -54,7 +52,6 @@ services:
 
   wordpress-cli:
     image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
-    container_name: wordpress-cli
     labels:
       - networks=bridge
     user: "1001:root"
@@ -79,7 +76,6 @@ services:
 
   sauvegarde:
     image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
-    container_name: sauvegarde
     labels:
       - networks=bridge
     user: "1001:root"
@@ -104,7 +100,6 @@ services:
 
   cloudflare-tunnel:
     image: cloudflare/cloudflared:latest
-    container_name: cloudflare-tunnel
     labels:
       - networks=bridge
     command:
@@ -133,7 +128,6 @@ services:
 
   media:
     image: docker.io/rclone/rclone:1
-    container_name: synchroniser-les-media
     user: "1001:0"
     command: >-
       copy /mnt/wordpress/wp-content/uploads natbienetre:natbienetre -v
@@ -153,12 +147,11 @@ services:
         mode: 0400
     restart: "no"
 
-  pages:
+  publier:
     build:
       context: ./static_html
     command:
       - https://github.com/natbienetre/www.git
-    container_name: publier-le-site
     environment:
       - SOURCE=/mnt/site_html
     volumes:
