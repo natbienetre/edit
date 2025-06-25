@@ -23,6 +23,7 @@ services:
     user: "1001:root"
     networks:
       - backend
+      - frontend
 #    network_mode: host
     volumes:
       - 'wordpress_data:/var/www/html:U'
@@ -97,8 +98,6 @@ services:
 
   cloudflare-tunnel:
     image: cloudflare/cloudflared:latest
-    labels:
-      - networks=bridge
     command:
       - tunnel
       - --no-autoupdate
@@ -118,7 +117,7 @@ services:
       start_period: 120s
 
     networks:
-      - backend
+      - frontend
     #volumes:
     #  - './certs/rootCA.crt:/mnt/natbienetre.fr.pem'
     secrets:
@@ -167,6 +166,7 @@ services:
 networks:
   #bridge:
   #  external: true
+  frontend: {}
   backend: {}
 
 volumes:
