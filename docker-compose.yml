@@ -28,8 +28,7 @@ services:
       - 'wordpress_data:/var/www/html:U'
       - 'site_html:/opt/bitnami/wordpress_static:U'
     secrets:
-      - source: manual_natbienetre_wordpress_key
-
+      - source: external_natbienetre_wordpress_key
     depends_on:
       mariadb:
         condition: service_healthy
@@ -107,9 +106,9 @@ services:
       - localhost:3333
       - run
     environment:
-      - TUNNEL_TOKEN_FILE=/run/secrets/manual_natbienetre_cloudflare_token
+      - TUNNEL_TOKEN_FILE=/run/secrets/external_natbienetre_cloudflare_token
     configs:
-      - source: manual_natbienetre_wordpress_ca
+      - source: external_natbienetre_wordpress_ca
         target: /mnt/wordpress-ca.pem
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3333/ready"]
@@ -123,7 +122,7 @@ services:
     #volumes:
     #  - './certs/rootCA.crt:/mnt/natbienetre.fr.pem'
     secrets:
-      - manual_natbienetre_cloudflare_token
+      - external_natbienetre_cloudflare_token
     restart: "always"
 
   media:
@@ -187,7 +186,7 @@ secrets:
     file: ~/.gitconfig
   rclone_configuration:
     file: ~/.config/rclone/rclone.conf
-  manual_natbienetre_cloudflare_token:
+  external_natbienetre_cloudflare_token:
     external: true
-  manual_natbienetre_wordpress_key:
+  external_natbienetre_wordpress_key:
     external: true

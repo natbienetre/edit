@@ -11,7 +11,7 @@ You can get the token from https://one.dash.cloudflare.com/$CLOUDFLARE_ACCOUNT_I
 
 EOF
 
-SECRET_NAME=manual_natbienetre_cloudflare_token
+SECRET_NAME=external_natbienetre_cloudflare_token
 
 if podman secret exists "$SECRET_NAME"; then
     echo "Secret $SECRET_NAME already exists. Please remove it before running this script again."
