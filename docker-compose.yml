@@ -28,8 +28,8 @@ services:
       - 'wordpress_data:/var/www/html:U'
       - 'site_html:/opt/bitnami/wordpress_static:U'
     secrets:
-      - source: manual_natbienetre_wordpress_certificate
       - source: manual_natbienetre_wordpress_key
+
     depends_on:
       mariadb:
         condition: service_healthy
@@ -108,6 +108,9 @@ services:
       - run
     environment:
       - TUNNEL_TOKEN_FILE=/run/secrets/manual_natbienetre_cloudflare_token
+    configs:
+      - source: manual_natbienetre_wordpress_ca
+        target: /mnt/wordpress-ca.pem
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3333/ready"]
       interval: 1m30s
@@ -185,8 +188,6 @@ secrets:
   rclone_configuration:
     file: ~/.config/rclone/rclone.conf
   manual_natbienetre_cloudflare_token:
-    external: true
-  manual_natbienetre_wordpress_certificate:
     external: true
   manual_natbienetre_wordpress_key:
     external: true
