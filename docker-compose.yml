@@ -35,13 +35,11 @@ services:
         condition: service_healthy
         restart: true
     environment:
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
       - WORDPRESS_DEBUG=1
-      - ALLOW_EMPTY_PASSWORD=yes
-      - WORDPRESS_DATABASE_HOST=mariadb
-      - WORDPRESS_DATABASE_PORT_NUMBER=3306
-      - WORDPRESS_DATABASE_USER=wordpress
-      - WORDPRESS_DATABASE_NAME=wordpress
+      - WORDPRESS_DB_HOST=mariadb:3306
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress
     extra_hosts:
       - edit.natbienetre.fr:127.0.0.1
       - natbienetre.fr:127.0.0.1
