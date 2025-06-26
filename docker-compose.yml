@@ -13,6 +13,7 @@ services:
       - MARIADB_SKIP_TEST_DB=yes
       - MARIADB_USER=wordpress
       - MARIADB_DATABASE=wordpress
+    restart: "always"
 
   wordpress:
     build:
@@ -48,6 +49,7 @@ services:
       - natbienetre.fr:127.0.0.1
     cap_add:
       - NET_BIND_SERVICE
+    restart: "always"
 
   wordpress-cli:
     image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
