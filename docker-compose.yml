@@ -29,7 +29,8 @@ services:
       - 'wordpress_data:/var/www/html:U'
       - 'site_html:/opt/bitnami/wordpress_static:U'
     secrets:
-      - source: external_natbienetre_wordpress_key
+      - external_natbienetre_wordpress_key
+      - external_natbienetre_wordpress_certificate
     depends_on:
       mariadb:
         condition: service_healthy
@@ -106,9 +107,9 @@ services:
       - run
     environment:
       - TUNNEL_TOKEN_FILE=/run/secrets/external_natbienetre_cloudflare_token
-    configs:
-      - source: external_natbienetre_wordpress_ca
-        target: /mnt/wordpress-ca.pem
+    secrets:
+      - external_natbienetre_wordpress_ca
+      - external_natbienetre_cloudflare_token
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3333/ready"]
       interval: 1m30s
@@ -120,8 +121,6 @@ services:
       - frontend
     #volumes:
     #  - './certs/rootCA.crt:/mnt/natbienetre.fr.pem'
-    secrets:
-      - external_natbienetre_cloudflare_token
     restart: "always"
 
   media:
@@ -189,4 +188,8 @@ secrets:
   external_natbienetre_cloudflare_token:
     external: true
   external_natbienetre_wordpress_key:
+    external: true
+  external_natbienetre_wordpress_certificate:
+    external: true
+  external_natbienetre_wordpress_ca:
     external: true
