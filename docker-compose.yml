@@ -19,8 +19,6 @@ services:
     build:
       context: ./wordpress
     # image: wordpress:php8.2-apache
-    labels:
-      - networks=bridge
     user: "1001:root"
     networks:
       - backend
@@ -53,8 +51,6 @@ services:
 
   wordpress-cli:
     image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
-    labels:
-      - networks=bridge
     user: "1001:root"
     networks:
       - backend
@@ -77,8 +73,6 @@ services:
 
   sauvegarde:
     image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
-    labels:
-      - networks=bridge
     user: "1001:root"
     networks:
       - backend
