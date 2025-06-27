@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-project_name=natbienetre
+project_name="${1:-natbienetre}"
 
 echo "Deleting containers..."
 
