@@ -14,10 +14,5 @@ else
     echo "Cloudflare token found"
 fi
 
-# echo "Creating containers..."
-
-# podman-compose --project-name "$project_name" up --build --pull --force-recreate --always-recreate-deps --remove-orphans --no-start
-
-echo "Starting containers..."
-
-podman-compose --project-name "$project_name" up --build --pull --force-recreate --always-recreate-deps --remove-orphans wordpress cloudflare-tunnel
+"$PWD/scripts/install-certificates.sh" "$project_name"
+"$PWD/scripts/start-containers.sh" "$project_name"
