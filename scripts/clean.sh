@@ -3,13 +3,14 @@
 set -euo pipefail
 
 project_name="${1:-natbienetre}"
+CONTAINER_CLI="${CONTAINER_CLI:-podman}"
 
 echo "Deleting containers..."
 
-podman-compose --project-name "$project_name" down --rmi all --remove-orphans
+"${CONTAINER_CLI}-compose" --project-name "$project_name" down --rmi all --remove-orphans
 
 echo "Deleting secrets..."
 
-podman secret rm "external_${project_name}_wordpress_certificate"
-podman secret rm "external_${project_name}_wordpress_key"
-podman secret rm "external_${project_name}_wordpress_ca"
+"$CONTAINER_CLI" secret rm "external_${project_name}_wordpress_certificate"
+"$CONTAINER_CLI" secret rm "external_${project_name}_wordpress_key"
+"$CONTAINER_CLI" secret rm "external_${project_name}_wordpress_ca"

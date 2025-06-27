@@ -3,6 +3,7 @@
 set -euo pipefail
 
 project_name="${1:-natbienetre}"
+CONTAINER_CLI="${CONTAINER_CLI:-podman}"
 
 echo "Creating certificates..."
 
@@ -12,6 +13,6 @@ mkcert -cert-file "./wordpress/cert.pem" -key-file "./wordpress/key.pem" "${2:-e
 
 echo "Creating secrets..."
 
-podman secret create --replace "external_${project_name}_wordpress_certificate" "./wordpress/cert.pem"
-podman secret create --replace "external_${project_name}_wordpress_key" "./wordpress/key.pem"
-podman secret create --replace "external_${project_name}_wordpress_ca" "./wordpress/ca/rootCA.pem"
+"${CONTAINER_CLI}" secret create --replace "external_${project_name}_wordpress_certificate" "./wordpress/cert.pem"
+"${CONTAINER_CLI}" secret create --replace "external_${project_name}_wordpress_key" "./wordpress/key.pem"
+"${CONTAINER_CLI}" secret create --replace "external_${project_name}_wordpress_ca" "./wordpress/ca/rootCA.pem"
