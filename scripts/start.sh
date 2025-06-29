@@ -17,4 +17,14 @@ fi
 
 echo "Starting containers..."
 
-"${CONTAINER_CLI}-compose" --project-name "$project_name" up --build --pull --quiet-pull --force-recreate --abort-on-container-failure --always-recreate-deps --remove-orphans wordpress cloudflare-tunnel
+"${CONTAINER_CLI}-compose" \
+    --project-name "$project_name" \
+    up \
+        --build \
+        --pull \
+        --quiet-pull \
+        --force-recreate \
+        --abort-on-container-failure \
+        --always-recreate-deps \
+        `# --remove-orphans` \
+        wordpress cloudflare-tunnel
