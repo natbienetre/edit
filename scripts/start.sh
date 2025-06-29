@@ -11,6 +11,7 @@ if ! "${CONTAINER_CLI}" secret exists "external_${project_name}_cloudflare_token
     echo "Cloudflare token not found. Please create a token with the following command:" >&2
     echo "  $PWD/cloudflared/create-secret.sh" >&2
     echo "and try again." >&2
+    exit 1
 else
     echo "Cloudflare token found"
 fi
