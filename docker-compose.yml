@@ -8,7 +8,6 @@ services:
       - backend
     environment:
       - MARIADB_RANDOM_ROOT_PASSWORD=yes
-      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=yes
       - MARIADB_SKIP_TEST_DB=yes
       - MARIADB_USER=wordpress
       - MARIADB_PASSWORD=wordpress
