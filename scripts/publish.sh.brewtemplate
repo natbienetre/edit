@@ -2,14 +2,11 @@
 
 set -euo pipefail
 
-project_name="${1:-natbienetre}"
-CONTAINER_CLI="${CONTAINER_CLI:-podman}"
-PODMAN_COMPOSE_PROVIDER="${PODMAN_COMPOSE_PROVIDER:-${CONTAINER_CLI}-compose}"
-
 echo "Starting containers..."
 
-"${PODMAN_COMPOSE_PROVIDER}" \
-    --project-name "$project_name" \
+'{{PODMAN_COMPOSE_PROVIDER}}' \
+    --project-name '{{PROJECT_NAME}}' \
+    --file '{{COMPOSE_FILE}}' \
     up \
         --build \
         --pull \
