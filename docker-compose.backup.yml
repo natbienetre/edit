@@ -1,0 +1,29 @@
+# Source: https://raw.githubusercontent.com/bitnami/bitnami-docker-wordpress/master/docker-compose.yml
+services:
+  sauvegarde:
+    image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
+    user: "1001:root"
+    networks:
+      - natbienetre_backend
+    volumes:
+      - 'natbienetre_wordpress_data:/var/www/html:ro'
+      - 'backups:/opt/backups:U'
+    environment:
+      - WORDPRESS_DEBUG=1
+      - WORDPRESS_DB_HOST=mariadb:3306
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress
+    extra_hosts:
+      - edit.natbienetre.fr:127.0.0.1
+    entrypoint: ["/usr/bin/env", "bash", "-c", "wp db export \"/opt/backups/$(date '+%Y-%m-%d %H:%M:%S').sql\""]
+
+networks:
+  natbienetre_backend:
+    external: true
+
+volumes:
+  natbienetre_wordpress_data:
+    external: true
+  backups:
+    driver: local

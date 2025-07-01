@@ -15,6 +15,6 @@ echo "Starting containers..."
         --pull \
         --quiet-pull \
         --force-recreate \
-        `# --abort-on-container-failure` \
-        `# --remove-orphans` \
+        --abort-on-container-failure \
+        --remove-orphans \
         sauvegarde
