@@ -1,0 +1,86 @@
+# Source: https://raw.githubusercontent.com/bitnami/bitnami-docker-wordpress/master/docker-compose.yml
+services:
+  wp:
+    image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
+    user: "1001:root"
+    networks:
+      - backend
+    volumes:
+      - 'natbienetre_wordpress_data:/var/www/html:U'
+      - 'natbienetre_site_html:/opt/bitnami/wordpress_static:U'
+    depends_on:
+      - mariadb
+    environment:
+      - WORDPRESS_DEBUG=1
+      - WORDPRESS_DB_HOST=mariadb:3306
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress
+    extra_hosts:
+      - edit.natbienetre.fr:127.0.0.1
+    entrypoint: ["/usr/bin/env", "bash", "-c", "sleep infinite"]
+
+  media:
+    image: docker.io/rclone/rclone:1
+    user: "1001:0"
+    command: >-
+      copy /mnt/wordpress/wp-content/uploads natbienetre:natbienetre -v
+        --fast-list --metadata
+        --config /run/secrets/rclone.conf
+        --exclude '/simply-static/**'
+        --exclude '/wpcode-logs/**'
+    #    --include '/{{\d{4}/.*}}'
+    #    --include '/uag-plugin/**'
+    volumes:
+      - 'natbienetre_wordpress_data:/mnt/wordpress'
+    secrets:
+      - source: rclone_configuration
+        target: rclone.conf
+        uid: "1001"
+        gid: "0"
+        mode: 0400
+    restart: "no"
+
+  publier:
+    build:
+      context: ./static_html
+    command:
+      - https://github.com/natbienetre/www.git
+    environment:
+      - SOURCE=/mnt/site_html
+    volumes:
+      - 'natbienetre_site_html:/mnt/site_html:ro'
+      - 'static_repo:/gitrepo:ro'
+    secrets:
+      - source: git_configuration
+        target: gitconfig
+        uid: "1001"
+        gid: "0"
+        mode: 0400
+    restart: "no"
+
+networks:
+  natbienetre_backend:
+    external: true
+
+volumes:
+  natbienetre_wordpress_data:
+    external: true
+  natbienetre_site_html:
+    external: true
+  static_repo:
+    driver: local
+
+secrets:
+  git_configuration:
+    file: ~/.gitconfig
+  rclone_configuration:
+    file: ~/.config/rclone/rclone.conf
+  external_natbienetre_cloudflare_token:
+    external: true
+  external_natbienetre_wordpress_key:
+    external: true
+  external_natbienetre_wordpress_certificate:
+    external: true
+  external_natbienetre_wordpress_ca:
+    external: true

@@ -92,45 +92,6 @@ services:
     #  - './certs/rootCA.crt:/mnt/natbienetre.fr.pem'
     restart: "always"
 
-  media:
-    image: docker.io/rclone/rclone:1
-    user: "1001:0"
-    command: >-
-      copy /mnt/wordpress/wp-content/uploads natbienetre:natbienetre -v
-        --fast-list --metadata
-        --config /run/secrets/rclone.conf
-        --exclude '/simply-static/**'
-        --exclude '/wpcode-logs/**'
-    #    --include '/{{\d{4}/.*}}'
-    #    --include '/uag-plugin/**'
-    volumes:
-      - 'wordpress_data:/mnt/wordpress'
-    secrets:
-      - source: rclone_configuration
-        target: rclone.conf
-        uid: "1001"
-        gid: "0"
-        mode: 0400
-    restart: "no"
-
-  publier:
-    build:
-      context: ./static_html
-    command:
-      - https://github.com/natbienetre/www.git
-    environment:
-      - SOURCE=/mnt/site_html
-    volumes:
-      - 'site_html:/mnt/site_html:ro'
-      - 'static_repo:/gitrepo:ro'
-    secrets:
-      - source: git_configuration
-        target: gitconfig
-        uid: "1001"
-        gid: "0"
-        mode: 0400
-    restart: "no"
-
 networks:
   #bridge:
   #  external: true
@@ -143,8 +104,6 @@ volumes:
   wordpress_data:
     driver: local
   site_html:
-    driver: local
-  static_repo:
     driver: local
 
 secrets:
