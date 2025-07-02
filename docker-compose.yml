@@ -107,10 +107,6 @@ volumes:
     driver: local
 
 secrets:
-  git_configuration:
-    file: ~/.gitconfig
-  rclone_configuration:
-    file: ~/.config/rclone/rclone.conf
   external_natbienetre_cloudflare_token:
     external: true
   external_natbienetre_wordpress_key:
