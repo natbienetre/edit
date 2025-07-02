@@ -4,7 +4,7 @@ services:
     image: wordpress:cli-php8.2 # wordpress:cli-2.6.0-php8.0
     user: "1001:root"
     networks:
-      - backend
+      - natbienetre_backend
     volumes:
       - 'natbienetre_wordpress_data:/var/www/html:U'
       - 'natbienetre_site_html:/opt/bitnami/wordpress_static:U'
