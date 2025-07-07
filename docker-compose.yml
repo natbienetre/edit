@@ -79,13 +79,30 @@ services:
     secrets:
       - external_natbienetre_wordpress_ca
       - external_natbienetre_cloudflare_token
+    volumes:
+      # For docker and podman
+      - /run/user/501/podman/podman.sock:/var/run/docker.sock
+    security_opt: # https://docs.podman.io/en/v4.6.0/markdown/options/security-opt.html
+      - "label=disable" # required to request the unix socket
+    user: 0:0 # To be removed, it is to have access to the unix socket
+    # userns_mode: keep-id:uid=501,gid=1000
+    # x-podman.uidmaps:
+    #   # - 0:501:1
+    #   # - 1:1:500
+    #   # - 501:502:65030
+    #   - 0:1:501
+    #   - 65532:501:1 # 65532 is the uid of the user in the container
+    #   - 501:502:65030
+    # x-podman.gidmaps:
+    #   - 0:0:1000
+    #   - 65532:1000:1 # 65532 is the uid of the user in the container
+    #   - 1001:1002:64531
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3333/ready"]
       interval: 1m30s
       timeout: 10s
       retries: 3
       start_period: 120s
-
     networks:
       - frontend
     #volumes:
